@@ -41,22 +41,30 @@ public class App
 		session = cluster.connect("segsoft");
     	
     	while(rs.next()) {
-    		if (n == rs.getInt("invoice"))
-    	    	
-    			
-        		session.execute("INSERT INTO invoices (id, client, address, invoice, service_description, quantity, unity_value, tax_percent, discount_percent, subtotal, value, resource, work) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rs.getInt("id"), rs.getString("client"), rs.getString("address"), rs.getInt("invoice"), rs.getString("service_description"), rs.getInt("quantity"), rs.getDouble("unit_value"), rs.getDouble("tax_percent"), rs.getDouble("discount_percent"), rs.getDouble("subtotal"), rs.getDouble("value"), rs.getString("resource"), rs.getString("work")) ;
-
-//        		session.execute("INSERT INTO invoices (id, client, address, invoice, service_description, quantity, unity_value, tax_percent, discount_percent, subtotal, value, resource, work) VALUES " (12, 'RIC TV', 'Rua Amauri Lange Silvério, 450 - Pilarzinho', 1901419, 'PHP Developer for Software House', 33, 30, 0.26, 0.08, 1168.1999923288822, 9454.300007522106, 'Hirotaka Takeuchi', 'Administration'));
-    		
-    		
+    		if (n == rs.getInt("invoice")) {
+        		session.execute("INSERT INTO notas (id, client, address, invoice, "
+        				+ "service_description, quantity, unit_value, tax_percent, discount_percent,"
+        				+ " subtotal, value, resource, work) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        				rs.getInt("id"), rs.getString("client"), rs.getString("address"), rs.getInt("invoice"), 
+        				rs.getString("service_description"), rs.getInt("quantity"), rs.getDouble("unit_value"), 
+        				rs.getDouble("tax_percent"), rs.getDouble("discount_percent"), rs.getDouble("subtotal"), 
+        				rs.getDouble("value"), rs.getString("resource"), rs.getString("work")) ;
+        		System.out.println("Encontrado na linha:" + rs.getRow());
+    		} 
+    		else {	
+    				System.out.println("Número da nota não encontrado na linha");
+    			 }
     	}
   
-    	
-    	
     	DataSource.closeResultSet(rs);
     	DataSource.closeStatement(stmt);
     	DataSource.closeConnection(conn);
     	
+    	
+    	
+    	com.datastax.driver.core.ResultSet resultCassandra = session.execute("SELECT * FROM notas WHERE invoice = "+n);
+    	
     	cluster.close();	
+    	
     }
 }
