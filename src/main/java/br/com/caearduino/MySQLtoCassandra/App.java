@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
 public class App 
@@ -16,6 +17,9 @@ public class App
     {
         Scanner keyboard = new Scanner(System.in);
         int n, numberInvoice;
+        int linha = 1;
+        String cliente, endereco;
+        Double total;
         
 
     	
@@ -35,13 +39,16 @@ public class App
     	System.out.println("Insira número da nota para consulta");
     	n = keyboard.nextInt();
     	
+    	
     	Cluster cluster;
 		Session session;
 		cluster = Cluster.builder().addContactPoint("localhost").build();
 		session = cluster.connect("segsoft");
     	
-    	while(rs.next()) {
-    		if (n == rs.getInt("invoice")) {
+    	while(rs.next()) 
+    	{
+    		if (n == rs.getInt("invoice")) 
+    		{
         		session.execute("INSERT INTO notas (id, client, address, invoice, "
         				+ "service_description, quantity, unit_value, tax_percent, discount_percent,"
         				+ " subtotal, value, resource, work) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -50,21 +57,45 @@ public class App
         				rs.getDouble("tax_percent"), rs.getDouble("discount_percent"), rs.getDouble("subtotal"), 
         				rs.getDouble("value"), rs.getString("resource"), rs.getString("work")) ;
         		System.out.println("Encontrado na linha:" + rs.getRow());
-    		} 
-    		else {	
-    				System.out.println("Número da nota não encontrado na linha");
-    			 }
+        		linha = rs.getRow();
+    		}
     	}
-  
+    	rs.absolute(linha);
+    	cliente = rs.getString("client");
+    	endereco = rs.getString("address");
+    	total = rs.getDouble("value");
+    	System.out.println(cliente);
+    	System.out.println(endereco);
+    	System.out.println(total);
+    	
     	DataSource.closeResultSet(rs);
     	DataSource.closeStatement(stmt);
     	DataSource.closeConnection(conn);
-    	
-    	
-    	
+    	 	
     	com.datastax.driver.core.ResultSet resultCassandra = session.execute("SELECT * FROM notas WHERE invoice = "+n);
     	
-    	cluster.close();	
-    	
+    	System.out.println("Itens da nota");
+    	for (Row row: resultCassandra)
+    	{
+    		String descricao_servico = row.getString("service_description");
+    		int quantidade = row.getInt("quantity");
+    		Double valor_unitario = row.getDouble("unit_value");
+    		String nome_recurso = row.getString("resource");
+    		String funcao_recurso = row.getString("work");
+    		Double taxa = row.getDouble("tax_percent");
+    		Double desconto = row.getDouble("discount_percent");
+    		Double subtotal = row.getDouble("subtotal");
+    		
+    		System.out.println(descricao_servico);
+    		System.out.println(quantidade);
+    		System.out.println(valor_unitario);
+    		System.out.println(nome_recurso);
+    		System.out.println(funcao_recurso);
+    		System.out.println(taxa);
+    		System.out.println(desconto);
+    		System.out.println(subtotal);
+    		
+    	}
+    	cluster.close();	  	
     }
 }
