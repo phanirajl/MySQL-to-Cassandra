@@ -1,5 +1,7 @@
 package br.com.caearduino.MySQLtoCassandra;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,11 +11,16 @@ import java.util.Scanner;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class App 
 {
     
-	public static void main( String[] args ) throws SQLException
+	public static void main( String[] args ) throws SQLException, DocumentException
     {
         Scanner keyboard = new Scanner(System.in);
         int n, numberInvoice;
@@ -21,7 +28,20 @@ public class App
         String cliente, endereco;
         Double total;
         
-
+        Document documentoPdf = new Document();
+        
+        try {
+        	PdfWriter.getInstance(documentoPdf, new FileOutputStream("/Users/caearduino/Documents/relatorio.pdf"));
+        	documentoPdf.open();
+        	documentoPdf.setPageSize(PageSize.A4);
+        	
+        }
+        catch (DocumentException de) {
+			de.printStackTrace();
+		}
+        catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
     	
 		Connection conn = DataSource.getConnection();
     	Statement stmt = DataSource.getStatement(conn);
@@ -38,8 +58,7 @@ public class App
     	
     	System.out.println("Insira número da nota para consulta");
     	n = keyboard.nextInt();
-    	
-    	
+  	  	
     	Cluster cluster;
 		Session session;
 		cluster = Cluster.builder().addContactPoint("localhost").build();
@@ -64,9 +83,18 @@ public class App
     	cliente = rs.getString("client");
     	endereco = rs.getString("address");
     	total = rs.getDouble("value");
-    	System.out.println(cliente);
-    	System.out.println(endereco);
-    	System.out.println(total);
+    	
+    	try {
+			documentoPdf.add(new Paragraph("Cliente:" + cliente));
+			documentoPdf.add(new Paragraph("Endereço: " + endereco));
+			documentoPdf.add(new Paragraph("Valor total da nota: " + String.valueOf(total)));
+		} 
+    	catch (DocumentException de) {
+			de.printStackTrace();
+		}
+//    	System.out.println(cliente);
+//    	System.out.println(endereco);
+//    	System.out.println(total);
     	
     	DataSource.closeResultSet(rs);
     	DataSource.closeStatement(stmt);
@@ -75,27 +103,43 @@ public class App
     	com.datastax.driver.core.ResultSet resultCassandra = session.execute("SELECT * FROM notas WHERE invoice = "+n);
     	
     	System.out.println("Itens da nota");
+    	try {
+			documentoPdf.add(new Paragraph("Itens da nota"));
+		} catch (DocumentException de) {
+			de.printStackTrace();
+		}
+    	
     	for (Row row: resultCassandra)
     	{
-    		String descricao_servico = row.getString("service_description");
-    		int quantidade = row.getInt("quantity");
-    		Double valor_unitario = row.getDouble("unit_value");
-    		String nome_recurso = row.getString("resource");
-    		String funcao_recurso = row.getString("work");
-    		Double taxa = row.getDouble("tax_percent");
-    		Double desconto = row.getDouble("discount_percent");
-    		Double subtotal = row.getDouble("subtotal");
+    		documentoPdf.add(new Paragraph("Descrição do serviço: " + row.getString("service_description")));
+//    		String descricao_servico = row.getString("service_description");
+//    		int quantidade = row.getInt("quantity");
+//    		documentoPdf.add(new Paragraph("Quantidade: " + quantidade));
+
+//    		documentoPdf.add(new Paragraph("Valor Unitário: " + String.valueOf(row.getDouble("unit_value"))));
+//    		Double valor_unitario = row.getDouble("unit_value");
+//    		documentoPdf.add(new Paragraph("Nome do recurso: " + String.valueOf(row.getString("resource"))));
+//    		String nome_recurso = row.getString("resource");
+//    		documentoPdf.add(new Paragraph("Função do recurso: " + row.getString("work")));
+//    		String funcao_recurso = row.getString("work");
+//    		documentoPdf.add(new Paragraph("Taxa/Impostos: " + String.valueOf(row.getDouble("tax_percent"))));
+//    		Double taxa = row.getDouble("tax_percent");
+//    		documentoPdf.add(new Paragraph("Desconto: " + String.valueOf(row.getDouble("discount_percent"))));
+//    		Double desconto = row.getDouble("discount_percent");
+//    		documentoPdf.add(new Paragraph("Subtotal: " + String.valueOf(row.getDouble("subtotal"))));
+//    		Double subtotal = row.getDouble("subtotal");
     		
-    		System.out.println(descricao_servico);
-    		System.out.println(quantidade);
-    		System.out.println(valor_unitario);
-    		System.out.println(nome_recurso);
-    		System.out.println(funcao_recurso);
-    		System.out.println(taxa);
-    		System.out.println(desconto);
-    		System.out.println(subtotal);
+//    		System.out.println(descricao_servico);
+//    		System.out.println(quantidade);
+//    		System.out.println(valor_unitario);
+//    		System.out.println(nome_recurso);
+//    		System.out.println(funcao_recurso);
+//    		System.out.println(taxa);
+//    		System.out.println(desconto);
+//    		System.out.println(subtotal);
     		
     	}
-    	cluster.close();	  	
+    	documentoPdf.close();
+    	cluster.close();
     }
 }

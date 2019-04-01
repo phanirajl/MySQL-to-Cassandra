@@ -9,7 +9,6 @@ import java.sql.Statement;
 
 public class DataSource {
 	
-//	  	private static final String driver = "com.mysql.jdbc.Driver";
 		private static final String banco = "invoice_system_univali";
 		private static final String conexao = "jdbc:mysql://localhost:3306/" + banco;
 		private static final String user = "root";
@@ -18,13 +17,9 @@ public class DataSource {
 		public static Connection getConnection(){
             try {
                 Connection conn = null;
-       //         Class.forName(driver);
                 conn = DriverManager.getConnection(conexao, user, password);
                 System.out.println("Conectado");
                 return conn;
-        //    } catch (ClassNotFoundException e) {
-        //      System.out.println("Classe do Driver nao foi encontrada.");
-        //        return null;
             } catch (SQLException e) {
                 System.out.println("Erro ao obter a Connection.");
                 return null;
