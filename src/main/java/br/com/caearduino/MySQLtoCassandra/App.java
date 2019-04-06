@@ -116,17 +116,17 @@ public class App
 //    		int quantidade = row.getInt("quantity");
 //    		documentoPdf.add(new Paragraph("Quantidade: " + quantidade));
 
-//    		documentoPdf.add(new Paragraph("Valor Unitário: " + String.valueOf(row.getDouble("unit_value"))));
+    		documentoPdf.add(new Paragraph("Valor Unitário: " + String.valueOf(row.getDouble("unit_value"))));
 //    		Double valor_unitario = row.getDouble("unit_value");
-//    		documentoPdf.add(new Paragraph("Nome do recurso: " + String.valueOf(row.getString("resource"))));
+    		documentoPdf.add(new Paragraph("Nome do recurso: " + row.getString("resource")));
 //    		String nome_recurso = row.getString("resource");
-//    		documentoPdf.add(new Paragraph("Função do recurso: " + row.getString("work")));
+    		documentoPdf.add(new Paragraph("Função do recurso: " + row.getString("work")));
 //    		String funcao_recurso = row.getString("work");
-//    		documentoPdf.add(new Paragraph("Taxa/Impostos: " + String.valueOf(row.getDouble("tax_percent"))));
+    		documentoPdf.add(new Paragraph("Taxa/Impostos: " + String.valueOf(row.getDouble("tax_percent"))));
 //    		Double taxa = row.getDouble("tax_percent");
-//    		documentoPdf.add(new Paragraph("Desconto: " + String.valueOf(row.getDouble("discount_percent"))));
+    		documentoPdf.add(new Paragraph("Desconto: " + String.valueOf(row.getDouble("discount_percent"))));
 //    		Double desconto = row.getDouble("discount_percent");
-//    		documentoPdf.add(new Paragraph("Subtotal: " + String.valueOf(row.getDouble("subtotal"))));
+    		documentoPdf.add(new Paragraph("Subtotal: " + String.valueOf(row.getDouble("subtotal"))));
 //    		Double subtotal = row.getDouble("subtotal");
     		
 //    		System.out.println(descricao_servico);
