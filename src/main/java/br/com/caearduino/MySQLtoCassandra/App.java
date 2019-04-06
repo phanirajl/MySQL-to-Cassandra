@@ -85,16 +85,16 @@ public class App
     	total = rs.getDouble("value");
     	
     	try {
-			documentoPdf.add(new Paragraph("Cliente:" + cliente));
-			documentoPdf.add(new Paragraph("Endereço: " + endereco));
-			documentoPdf.add(new Paragraph("Valor total da nota: " + String.valueOf(total)));
+			documentoPdf.add(new Paragraph("CLIENTE: " + cliente));
+			documentoPdf.add(new Paragraph("ENDEREÇO: " + endereco));
+			documentoPdf.add(new Paragraph("VALOR TOTAL: R$" + String.valueOf(total)));
+			documentoPdf.add(new Paragraph("|---------------------------------------------------------------"
+					+ "-----------------------------------------------------------------|"));
+			documentoPdf.add(new Paragraph());
 		} 
     	catch (DocumentException de) {
 			de.printStackTrace();
 		}
-//    	System.out.println(cliente);
-//    	System.out.println(endereco);
-//    	System.out.println(total);
     	
     	DataSource.closeResultSet(rs);
     	DataSource.closeStatement(stmt);
@@ -102,42 +102,26 @@ public class App
     	 	
     	com.datastax.driver.core.ResultSet resultCassandra = session.execute("SELECT * FROM notas WHERE invoice = "+n);
     	
-    	System.out.println("Itens da nota");
     	try {
-			documentoPdf.add(new Paragraph("Itens da nota"));
+			documentoPdf.add(new Paragraph("ITENS DA NOTA"));
+			documentoPdf.add(new Paragraph());
 		} catch (DocumentException de) {
 			de.printStackTrace();
 		}
     	
     	for (Row row: resultCassandra)
     	{
+			documentoPdf.add(new Paragraph("|---------------------------------------------------------------"
+					+ "-----------------------------------------------------------------|"));
     		documentoPdf.add(new Paragraph("Descrição do serviço: " + row.getString("service_description")));
-//    		String descricao_servico = row.getString("service_description");
-//    		int quantidade = row.getInt("quantity");
-//    		documentoPdf.add(new Paragraph("Quantidade: " + quantidade));
-
-    		documentoPdf.add(new Paragraph("Valor Unitário: " + String.valueOf(row.getDouble("unit_value"))));
-//    		Double valor_unitario = row.getDouble("unit_value");
+    		documentoPdf.add(new Paragraph("Quantidade: " + String.valueOf(row.getInt("quantity"))));
+    		documentoPdf.add(new Paragraph("Valor Unitário: R$" + String.valueOf(row.getDouble("unit_value"))));
     		documentoPdf.add(new Paragraph("Nome do recurso: " + row.getString("resource")));
-//    		String nome_recurso = row.getString("resource");
     		documentoPdf.add(new Paragraph("Função do recurso: " + row.getString("work")));
-//    		String funcao_recurso = row.getString("work");
-    		documentoPdf.add(new Paragraph("Taxa/Impostos: " + String.valueOf(row.getDouble("tax_percent"))));
-//    		Double taxa = row.getDouble("tax_percent");
-    		documentoPdf.add(new Paragraph("Desconto: " + String.valueOf(row.getDouble("discount_percent"))));
-//    		Double desconto = row.getDouble("discount_percent");
-    		documentoPdf.add(new Paragraph("Subtotal: " + String.valueOf(row.getDouble("subtotal"))));
-//    		Double subtotal = row.getDouble("subtotal");
-    		
-//    		System.out.println(descricao_servico);
-//    		System.out.println(quantidade);
-//    		System.out.println(valor_unitario);
-//    		System.out.println(nome_recurso);
-//    		System.out.println(funcao_recurso);
-//    		System.out.println(taxa);
-//    		System.out.println(desconto);
-//    		System.out.println(subtotal);
-    		
+    		documentoPdf.add(new Paragraph("Taxa/Impostos: " + String.valueOf(100 * row.getDouble("tax_percent")) + "%"));
+    		documentoPdf.add(new Paragraph("Desconto: " + String.valueOf(100 * row.getDouble("discount_percent"))+ "%"));
+    		documentoPdf.add(new Paragraph("Subtotal: R$" + String.valueOf(row.getDouble("subtotal"))));  
+    		documentoPdf.add(new Paragraph());
     	}
     	documentoPdf.close();
     	cluster.close();
